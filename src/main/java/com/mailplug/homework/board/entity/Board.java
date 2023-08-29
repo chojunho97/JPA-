@@ -1,12 +1,10 @@
 package com.mailplug.homework.board.entity;
 
 import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,36 +17,46 @@ public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // PK
+    private Long id;
 
-    private String title; // 제목
+    private String name;
 
-    private String content; // 내용
+    private String title;
 
-    private String writer; // 작성자
+    private String content;
 
-    private int hits; // 조회 수
+    private String writer;
 
-    private char deleteYn; // 삭제 여부
+    private int hits;
 
-    private LocalDateTime createdDate = LocalDateTime.now(); // 생성일
+    private char deleteYn = 'N';
 
-    private LocalDateTime modifiedDate; // 수정일
+    private LocalDateTime createAt = LocalDateTime.now();
+
+    private LocalDateTime updateAt;
 
     @Builder
-    public Board(String title, String content, String writer, int hits, char deleteYn) {
+    public Board(String name, String title, String content, String writer, int hits) {
+        this.name = name;
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.hits = hits;
-        this.deleteYn = deleteYn;
     }
 
-    public void update(String title, String content, String writer) {
+    public void update(String name, String title, String content, String writer) {
+        this.name = name;
         this.title = title;
         this.content = content;
         this.writer = writer;
-        this.modifiedDate = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
     }
 
+    public void markAsDeleted() {
+        this.deleteYn = 'Y';
+    }
+
+    public void increaseHits() {
+        this.hits++;
+    }
 }

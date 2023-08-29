@@ -1,10 +1,10 @@
 package com.mailplug.homework.board.model;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,35 +23,56 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    /**
-     * 게시글 생성
-     */
     @Transactional
     public Long save(final BoardRequestDto params) {
-
         Board entity = boardRepository.save(params.toEntity());
         return entity.getId();
     }
 
-    /**
-     * 게시글 리스트 조회
-     */
-    public List<BoardResponseDto> findAll() {
+    public Page<BoardResponseDto> findAll(int page, int size, String title) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "id", "createAt"));
+        Page<Board> boards;
+        if (title == null) {
+            boards = boardRepository.findAllByDeleteYn('N', pageable);
+        } else {
+            boards = boardRepository.findByTitleContainingAndDeleteYn(title, 'N', pageable);
+        }
+        return boards.map(BoardResponseDto::new);
+    }
+    @Transactional
+    public BoardResponseDto findById(Long id) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
 
-        Sort sort = Sort.by(Direction.DESC, "id", "createdDate");
-        List<Board> list = boardRepository.findAll(sort);
-        return list.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        board.increaseHits();
+
+        return new BoardResponseDto(board);
     }
 
-    /**
-     * 게시글 수정
-     */
     @Transactional
     public Long update(final Long id, final BoardRequestDto params) {
-
-        Board entity = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
-        entity.update(params.getTitle(), params.getContent(), params.getWriter());
+        Board entity = boardRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        entity.update(params.getName(), params.getTitle(), params.getContent(), params.getWriter());
         return id;
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Board entity = boardRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        entity.markAsDeleted();  // 게시글을 삭제표시로 변경
+    }
+
+    public boolean isAuthor(Long id, String writerId) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        return board.getWriter().equals(writerId);
+    }
+
+    public Page<BoardResponseDto> findAllByBoardName(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "id", "createAt"));
+        Page<Board> boards = boardRepository.findByNameAndDeleteYn(name, 'N', pageable);  // Fetch non-deleted boards by board name
+        return boards.map(BoardResponseDto::new);
+    }
 }

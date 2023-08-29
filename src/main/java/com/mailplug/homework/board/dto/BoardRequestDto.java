@@ -2,27 +2,29 @@ package com.mailplug.homework.board.dto;
 
 import com.mailplug.homework.board.entity.Board;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.Size;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardRequestDto {
 
-    private String title; // 제목
-    private String content; // 내용
-    private String writer; // 작성자
-    private char deleteYn; // 삭제 여부
+    @Size(max = 100, message = "Title should not be longer than 100 characters.")
+    private String title;
+    private String name;
+    private String content;
+    private String writer;
 
     public Board toEntity() {
         return Board.builder()
+                .name(name)
                 .title(title)
                 .content(content)
                 .writer(writer)
                 .hits(0)
-                .deleteYn(deleteYn)
                 .build();
     }
-
 }
+

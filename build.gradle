@@ -22,6 +22,10 @@ repositories {
 }
 
 dependencies {
+	// Java Bean Validation API
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+	// Hibernate Validator (implementation of the Bean Validation)
+	implementation 'org.hibernate.validator:hibernate-validator:6.0.13.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
