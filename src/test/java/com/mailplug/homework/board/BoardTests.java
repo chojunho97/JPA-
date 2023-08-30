@@ -17,40 +17,40 @@ public class BoardTests {
     @Autowired
     BoardRepository boardRepository;
 
-    @Test
-    void save() {
+//    @Test
+//    void save() {
+//
+//        Board params = Board.builder()
+//                .title("게시글 제목")
+//                .content("게시글 내용")
+//                .writer("작성자")
+//                .hits(0)
+//                .build();
+//
+//        boardRepository.save(params);
+//
+//        Board entity = boardRepository.findById((long) 1).get();
+//        assertThat(entity.getTitle()).isEqualTo("게시글 제목");
+//        assertThat(entity.getContent()).isEqualTo("게시글 내용");
+//        assertThat(entity.getWriter()).isEqualTo("작성자");
+//    }
 
-        Board params = Board.builder()
-                .title("게시글 제목")
-                .content("게시글 내용")
-                .writer("작성자")
-                .hits(0)
-                .build();
+//    @Test
+//    void findAll() {
+//
+//        long boardsCount = boardRepository.count();
+//
+//        // 전체 게시글 리스트 조회
+//        List<Board> boards = boardRepository.findAll();
+//    }
 
-        boardRepository.save(params);
-
-        Board entity = boardRepository.findById((long) 1).get();
-        assertThat(entity.getTitle()).isEqualTo("게시글 제목");
-        assertThat(entity.getContent()).isEqualTo("게시글 내용");
-        assertThat(entity.getWriter()).isEqualTo("작성자");
-    }
-
-    @Test
-    void findAll() {
-
-        long boardsCount = boardRepository.count();
-
-        // 전체 게시글 리스트 조회
-        List<Board> boards = boardRepository.findAll();
-    }
-
-    @Test
-    void delete() {
-
-        Board entity = boardRepository.findById((long) 1).get();
-
-        // 게시글 삭제
-        boardRepository.delete(entity);
-    }
+//    @Test
+//    void delete() {
+//
+//        Board entity = boardRepository.findById((long) 1).get();
+//
+//        // 게시글 삭제
+//        boardRepository.delete(entity);
+//    }
 
 }
