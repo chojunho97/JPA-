@@ -37,10 +37,7 @@ public class BoardApiController {
 
     @GetMapping("/boards/{id}")
     public ResponseEntity<BoardResponseDto> findById(@PathVariable Long id) {
-        BoardResponseDto board = boardService.findById(id);
-        if (board.getDeleteYn() == 'Y') {
-            throw new CustomException(ErrorCode.POST_DELETED_OR_NOT_FOUND);
-        }
+        BoardResponseDto board = boardService.findById(id);  // 삭제 여부 및 존재 여부 확인은 Service 내에서 처리
         return ResponseEntity.ok(board);
     }
 
@@ -51,13 +48,7 @@ public class BoardApiController {
         if (!boardService.isAuthor(id, userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
-
-        BoardResponseDto existingBoard = boardService.findById(id);
-        if (existingBoard.getDeleteYn() == 'Y') {
-            throw new CustomException(ErrorCode.POST_DELETED_OR_NOT_FOUND);
-        }
-
-        Long updatedId = boardService.update(id, params);
+        Long updatedId = boardService.update(id, params);  // 삭제 여부 및 존재 여부 확인은 Service 내에서 처리
         return ResponseEntity.ok(updatedId);
     }
 
@@ -67,15 +58,10 @@ public class BoardApiController {
         if (!boardService.isAuthor(id, userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
-
-        BoardResponseDto existingBoard = boardService.findById(id);
-        if (existingBoard.getDeleteYn() == 'Y') {
-            throw new CustomException(ErrorCode.POST_DELETED_OR_NOT_FOUND);
-        }
-
-        boardService.delete(id);
+        boardService.delete(id);  // 삭제 여부 및 존재 여부 확인은 Service 내에서 처리
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/boards/type/{boardName}")
     public ResponseEntity<Page<BoardResponseDto>> findAllByBoardName(

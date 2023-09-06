@@ -39,34 +39,38 @@ public class BoardService {
         }
         return boards.map(BoardResponseDto::new);
     }
-    @Transactional
-    public BoardResponseDto findById(Long id) {
+    private Board findBoardById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
 
-        board.increaseHits();
+        if (board.getDeleteYn() == 'Y') {
+            throw new CustomException(ErrorCode.POST_DELETED_OR_NOT_FOUND);
+        }
+        return board;
+    }
 
+    @Transactional
+    public BoardResponseDto findById(Long id) {
+        Board board = findBoardById(id);
+        board.increaseHits();
         return new BoardResponseDto(board);
     }
 
     @Transactional
     public Long update(final Long id, final BoardRequestDto params) {
-        Board entity = boardRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        Board entity = findBoardById(id);
         entity.update(params.getName(), params.getTitle(), params.getContent(), params.getWriter());
         return id;
     }
 
     @Transactional
     public void delete(Long id) {
-        Board entity = boardRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        Board entity = findBoardById(id);
         entity.markAsDeleted();  // 게시글을 삭제표시로 변경
     }
 
     public boolean isAuthor(Long id, String writerId) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+        Board board = findBoardById(id);
         return board.getWriter().equals(writerId);
     }
 
